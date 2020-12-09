@@ -56,7 +56,7 @@
                     <input type="submit" value="Add">
                 </form>
         <?php
-        
+
                 break;
         }
     } else {
@@ -82,33 +82,29 @@
 
     function addProduct()
     {
-        $fields = ['product_name', 'product_description', 'product_price', 'product_stock'];
-        $areAllParameters = true;
-        foreach ($fields as $field) {
-            $areAllParameters = $areAllParameters && array_key_exists($field, $_POST);
-        }
+        $sanitizedArgs = sanitizeArgs($_POST);
+        if ($sanitizedArgs && $_GET['action'] == "add" && isset($_POST["submit"])) {
 
-        if ($areAllParameters) {
+            $productsDB = $GLOBALS["db_prefix"] . "PRODUCTS";
+            $imageDB = $GLOBALS["db_prefix"] . "IMAGES";
+            $GLOBALS["dbh"]->sendQuery("INSERT INTO $productsDB (`NAME_PRODUCT`, `DESCRIPTION_PRODUCT`, `PRICE_PRODUCT`, `STOCK_PRODUCT`) VALUES (?, ?, ?, ?)", array($sanitizedArgs['product_name'], $sanitizedArgs['product_description'], $sanitizedArgs['product_price'], $sanitizedArgs['product_stock']));
 
-            if ($_GET['action'] == "add" && isset($_POST["submit"])) {
-
-                $images = reArrayFiles($_FILES['product_images']);
-                $GLOBALS["dbh"]->sendQuerry("INSERT INTO " . $GLOBALS["db_prefix"] . "PRODUCTS (`NAME_PRODUCT`, `DESCRIPTION_PRODUCT`, `PRICE_PRODUCT`, `STOCK_PRODUCT`) VALUES ('" . $_POST['product_name'] . "','" . $_POST['product_description'] . "'," . $_POST['product_price'] . "," . $_POST['product_stock'] . ")   ");
-
-                $product = $GLOBALS["dbh"]->sendQuerry("SELECT LAST_INSERT_ID() as ID_PRODUCT");
-                /*
+            $product = $GLOBALS["dbh"]->sendQuery("SELECT LAST_INSERT_ID() as ID_PRODUCT");
+            /*
                 Put image in the public/images folder. Image's name is the same as is databse id
             */
+            if ($_FILES['product_images']['error'][0] == 0) {
+                $images = reArrayFiles($_FILES['product_images']);
                 foreach ($images as $image) {
                     $imageFileType = strtolower(pathinfo($image['name'], PATHINFO_EXTENSION));
 
                     //Extension test
 
                     if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-                        echo $image['name'] . " n'est pas dans le bon format seul JPG, JPEG, PNG & GIF sont alloué.";
+                        echo $image['name'] . " n'est pas dans le bon format seul JPG, JPEG, PNG & GIF sont authorisés.";
                     } else {
-                        $GLOBALS["dbh"]->sendQuerry("INSERT INTO " . $GLOBALS["db_prefix"] . "IMAGES (ID_PRODUCT, EXTENSION_IMAGE) VALUES (" . $product[0]['ID_PRODUCT'] . ", '" . $imageFileType . "'); SELECT LAST_INSERT_ID() as ID_IMAGE");
-                        $result = $GLOBALS["dbh"]->sendQuerry("SELECT LAST_INSERT_ID() as ID_IMAGE");
+                        $GLOBALS["dbh"]->sendQuery("INSERT INTO $imageDB (ID_PRODUCT, EXTENSION_IMAGE) VALUES (?, ?); SELECT LAST_INSERT_ID() as ID_IMAGE", [$product[0]['ID_PRODUCT'], $imageFileType]);
+                        $result = $GLOBALS["dbh"]->sendQuery("SELECT LAST_INSERT_ID() as ID_IMAGE");
                         if (move_uploaded_file($image['tmp_name'], __DIR__ . "/../public/images/" . $result[0]['ID_IMAGE'] . "." . $imageFileType)) {
                         } else {
                             echo $image['name'] . ' cannot be moved';
@@ -117,23 +113,18 @@
                 }
             }
         } else {
-            echo "<h1>Sorry but you have not provided all the required arguments</h1>";
+            echo "Provided arguments are not valid";
         }
     }
 
     function editProduct()
     {
-        $fields = ['product_name', 'product_description', 'product_price', 'product_stock'];
-        $areAllParameters = true;
-        foreach ($fields as $field) {
-            $areAllParameters = $areAllParameters && array_key_exists($field, $_POST);
-        }
-
-        if ($areAllParameters && isset($_GET['id'])) {
+        $sanitizedArgs = sanitizeArgs($_POST);
+        if ($sanitizedArgs && isset($_GET['id']) && filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT)) {
             if ($_GET['action'] == "edit" && isset($_POST["submit"])) {
 
-                $GLOBALS["dbh"]->sendQuerry("UPDATE " . $GLOBALS['db_prefix'] . "PRODUCTS
-                SET NAME_PRODUCT = '" . $_POST['product_name'] . "', DESCRIPTION_PRODUCT= '" . $_POST['product_description'] . "', PRICE_PRODUCT = " . $_POST['product_price'] . ", STOCK_PRODUCT = " . $_POST['product_stock'] . "
+                $GLOBALS["dbh"]->sendQuery("UPDATE " . $GLOBALS['db_prefix'] . "PRODUCTS
+                SET NAME_PRODUCT = '" . $sanitizedArgs['product_name'] . "', DESCRIPTION_PRODUCT= '" . $sanitizedArgs['product_description'] . "', PRICE_PRODUCT = " . $sanitizedArgs['product_price'] . ", STOCK_PRODUCT = " . $sanitizedArgs['product_stock'] . "
                 WHERE ID_PRODUCT = " . $_GET['id']);
                 echo "<h1>Product has been updated</h1>";
         ?>
@@ -153,6 +144,8 @@
                 </form>
         <?php
             }
+        } else {
+            echo "Provided arguments are not valid";
         }
     }
 
@@ -173,6 +166,33 @@
     }
 
 
+    /*function validateArgs($args, $fields):bool {
+        $areAllArgs = true;
+        foreach ($fields as $field) {
+            $areAllArgs = $areAllArgs && array_key_exists($field[0], $args) && filter_input($field[0], $field[1]) ;
+        }
+        return $areAllArgs;
+    }*/
+
+    function sanitizeArgs($args)
+    {
+        $out = [];
+        $filterArgs = array(
+            'product_name' => FILTER_SANITIZE_STRING,
+            'product_description' => FILTER_SANITIZE_STRING,
+            'product_price' => FILTER_VALIDATE_FLOAT,
+            'product_stock' => FILTER_VALIDATE_INT
+        );
+        foreach ($filterArgs as $key => $value) {
+            $tmp = filter_var($args[$key], $value);
+            if (!$tmp) {
+                return false;
+            } else {
+                $out[$key] = $tmp;
+            }
+        }
+        return $out;
+    }
 
 
     function displayForm($name, $desc, $price, $stock)
@@ -183,7 +203,7 @@
             <label for="product_description">Description :</label>
             <textarea name="product_description" id="product_description" cols="30" rows="10" required><?php echo $desc ?></textarea>
             <label for="product_price">Prix :</label>
-            <input type="number" name="product_price" id="product_price" required value="<?php echo $price ?>">
+            <input type="number" name="product_price" id="product_price" step="0.01" required value="<?php echo $price ?>">
             <label for="product_stock">Stock :</label>
             <input type="number" name="product_stock" id="product_stock" required value="<?php echo $stock ?>">
             Select image to upload:

@@ -10,7 +10,6 @@ class SqlHandler
 
     function __construct($host, $username, $password, $dbname, $port = null)
     {
-        $this->prefix = $prefix;
         try {
             $this->db = new PDO("mysql:host=$host;dbname=$dbname;port=$port", $username, $password);
         } catch (PDOException $e) {
@@ -23,14 +22,12 @@ class SqlHandler
         // Initialise la BDD
     }
 
-    function sendQuerry($query)
+    function sendQuery($query, $args = [])
     {
         $req = $this->db->prepare($query);
-        $req->execute();
+        $req->execute($args);
         return $req->fetchAll(PDO::FETCH_ASSOC);
     }
 }
-
-
 ?>
 

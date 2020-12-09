@@ -19,7 +19,10 @@ class Product
 
     public function getProductImages()
         {
-            $temp = $GLOBALS["dbh"]->sendQuerry("SELECT * FROM " . $GLOBALS["db_prefix"] . "PRODUCTS, ".$GLOBALS["db_prefix"]."IMAGES WHERE ".$GLOBALS["db_prefix"]."PRODUCTS.ID_PRODUCT = ".$GLOBALS["db_prefix"]."IMAGES.ID_PRODUCT AND ".$GLOBALS["db_prefix"]."IMAGES.ID_PRODUCT = ".$this->id);
+
+            $productsDB = $GLOBALS["db_prefix"] . "PRODUCTS";
+            $imageDB = $GLOBALS["db_prefix"] . "IMAGES";
+            $temp = $GLOBALS["dbh"]->sendQuery("SELECT * FROM $productsDB, $imageDB WHERE ".$productsDB.".ID_PRODUCT = ".$imageDB.".ID_PRODUCT AND ".$imageDB.".ID_PRODUCT = ".$this->id);
             if (count($temp) != 0){
                 $out = [];
                 foreach ($temp as $image) {
@@ -37,7 +40,8 @@ class Product
 
     public static function getProduct($id)
     {
-        $temp = $GLOBALS["dbh"]->sendQuerry("SELECT DISTINCT * FROM " . $GLOBALS["db_prefix"] . "PRODUCTS WHERE ID_PRODUCT = $id");
+        $productsDB = $GLOBALS["db_prefix"] . "PRODUCTS";
+        $temp = $GLOBALS["dbh"]->sendQuery("SELECT DISTINCT * FROM $productsDB WHERE ID_PRODUCT = $id");
         if (count($temp) === 0) return null;
         return Product::productify($temp[0]);
     }
@@ -46,8 +50,9 @@ class Product
 
     public static function getEveryProducts()
     {
+        $productsDB = $GLOBALS["db_prefix"] . "PRODUCTS";
         $out = [];
-        foreach ($GLOBALS["dbh"]->sendQuerry("SELECT * FROM " . $GLOBALS["db_prefix"] . "PRODUCTS") as $product) {
+        foreach ($GLOBALS["dbh"]->sendQuery("SELECT * FROM $productsDB") as $product) {
             $out[] = Product::productify($product);
         }
         return $out;
