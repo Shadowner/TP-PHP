@@ -11,7 +11,11 @@ class SqlHandler
     function __construct($host, $username, $password, $dbname, $port = null)
     {
         try {
-            $this->db = new PDO("mysql:host=$host;dbname=$dbname;port=$port", $username, $password);
+            $this->db = new PDO("mysql:host=$host;port=$port", $username, $password);
+            if(count($this->sendQuery("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'eCommerce'")) == 0){
+                $this->init();
+            }
+            $this->sendQuery("USE ".$dbname);
         } catch (PDOException $e) {
             echo 'Connection failed: ' . $e->getMessage();
         }
@@ -19,7 +23,7 @@ class SqlHandler
 
     function init()
     {
-        // Initialise la BDD
+        $this->sendQuery(file_get_contents(__DIR__. "/../init.sql"));
     }
 
     function sendQuery($query, $args = [])

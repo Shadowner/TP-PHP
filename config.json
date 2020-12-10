@@ -1,11 +1,11 @@
 {
-    "host": "localhost",
-    "port": "3307",
+    "host": "mysql",
+    "port": "3306",
     "type": "MariaDB",
 
     "username": "root",
-    "password": "",
+    "password": "root",
 
     "db_name": "eCommerce",
-    "db_prefix": "ec_"
+    "db_prefix": "EC_"
 }
