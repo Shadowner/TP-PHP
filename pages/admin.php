@@ -1,4 +1,4 @@
-<main>
+ <main class="ptop admin">
 
     <?php
 
@@ -77,8 +77,6 @@
         </form>
         <?php
     }
-
-
 
     function addProduct()
     {

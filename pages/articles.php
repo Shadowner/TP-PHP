@@ -4,8 +4,8 @@ if (isset($_GET["id"])) {
     $product = Product::getProduct($_GET["id"]);
     if (!$product) return require(__DIR__ . "/home.php");
 ?>
-    <main class="flexRAround marginAll">
-        <div class="flexCCenter alignICenter">
+    <main class="flexRAround marginAll ptop">
+        <div class="flexCCenter alignICenter images-holder">
             <?php
             foreach ($product->getProductImages() as $image) { ?>
                 <img src="<?php echo $image ?>" alt="">
@@ -16,7 +16,7 @@ if (isset($_GET["id"])) {
             <h1><?php echo $product->title ?></h1>
         </div>
 
-        <div class="marginAll flexCCenter">
+        <div class="flexC">
             <h2>Mon magnifique prix est de : <b><?php echo $product->price ?>€TTC</b></h2>
             <p><?php echo $product->description ?></p>
             <?php
