@@ -13,7 +13,7 @@
             foreach ($products as $key => $product) { ?>
                 <a href="?pages=articles&id=<?php echo $product->id ?>">
                     <li class=" product flexCCenter alignICenter">
-                        <img src="<?php echo $product->images; ?>" class="paddingAll" alt="">
+                        <img src="<?php echo $product->getProductImages()[0]; ?>" class="paddingAll" alt="">
                         <div>
                             <h3><?php echo $product->price ?>€</h3>
                             <h4><?php echo $product->title ?></h4>

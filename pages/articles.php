@@ -2,11 +2,17 @@
 if (isset($_GET["id"])) {
 
     $product = Product::getProduct($_GET["id"]);
-    if(!$product)return require(__DIR__ . "/home.php");
+    if (!$product) return require(__DIR__ . "/home.php");
 ?>
     <main class="flexRAround marginAll">
         <div class="flexCCenter alignICenter">
-            <img src="<?php echo $product->images ? $product->images : "https://media.cultura.com/media/wysiwyg/VITRINES/2020/01_OP_CO/09_noel/Livre/W19/W19_liseuse.jpg"; ?>" alt="">
+            <?php
+            foreach ($product->getProductImages() as $image) { ?>
+                <img src="<?php echo $image ?>" alt="">
+            <?php
+            }
+            ?>
+
             <h1><?php echo $product->title ?></h1>
         </div>
 

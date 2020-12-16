@@ -26,7 +26,7 @@ class Product
             if (count($temp) != 0){
                 $out = [];
                 foreach ($temp as $image) {
-                    $out[] = "/public/images/".$image['ID_IMAGE'].$image['EXTENSION_IMAGE'];
+                    $out[] = "/TP-PHP/public/images/".$image['ID_IMAGE'].".".$image['EXTENSION_IMAGE'];
                 }
                 return $out;
             }
