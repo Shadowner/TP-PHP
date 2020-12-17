@@ -11,8 +11,8 @@ class SqlHandler
     {
         try {
             $this->db = new PDO("mysql:host=$host;port=$port", $username, $password);
-            if(count($this->sendQuery("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'eCommerce'")) == 0){
-                $this->init();
+            if(count($this->sendQuery("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '$dbname'")) == 0){
+                $this->init($dbname);
             }
             $this->sendQuery("USE ".$dbname);
         } catch (PDOException $e) {
@@ -20,9 +20,10 @@ class SqlHandler
         }
     }
 
-    function init()
+    function init($dbname)
     {
-        $this->sendQuery(file_get_contents(__DIR__. "/../init.sql"));
+        $tmp = str_replace('basededonnee', $dbname ,file_get_contents(__DIR__ . "/../init.sql") );
+        $this->sendQuery($tmp);
     }
 
     function sendQuery($query, $args = [])
