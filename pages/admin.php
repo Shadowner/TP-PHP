@@ -163,15 +163,6 @@
         return $file_ary;
     }
 
-
-    /*function validateArgs($args, $fields):bool {
-        $areAllArgs = true;
-        foreach ($fields as $field) {
-            $areAllArgs = $areAllArgs && array_key_exists($field[0], $args) && filter_input($field[0], $field[1]) ;
-        }
-        return $areAllArgs;
-    }*/
-
     function sanitizeArgs($args)
     {
         $out = [];
