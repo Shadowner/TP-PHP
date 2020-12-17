@@ -12,7 +12,6 @@
 
             $products = SessionH::$mySession->getFromSession("Panier");
 
-
             if (!$products) {
                 echo "<h2> Mais pourquoi vous n'avez rien dans votre magnifique panier ? :C";
                 return;
@@ -23,9 +22,9 @@
 
                 $total += $product->price;
                 ?>
-                <a href="?pages=articles&articles=<?php echo $product->id ?>">
+                <a href="?pages=articles&id=<?php echo $product->id ?>">
                     <li class=" product flexCCenter alignICenter">
-                        <img src="<?php echo $product->images ? $product->images : "https://media.cultura.com/media/wysiwyg/VITRINES/2020/01_OP_CO/09_noel/Livre/W19/W19_liseuse.jpg"; ?>" alt="">
+                        <img src="<?php echo $product->getProductImages()[0] ? $product->getProductImages()[0] : "https://media.cultura.com/media/wysiwyg/VITRINES/2020/01_OP_CO/09_noel/Livre/W19/W19_liseuse.jpg"; ?>" alt="">
                         <div>
                             <h3><?php echo $product->price ?>€</h3>
                             <h4><?php echo $product->title ?></h4>

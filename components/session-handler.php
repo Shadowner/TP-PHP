@@ -32,7 +32,8 @@
             $_SESSION[$param][md5(json_encode($obj))] = null;
             $_SESSION[$param] = array_filter($_SESSION[$param], function($a){return $a ? true:false;});
             // J'ai trouvé mais c'est peut-être un peut overkill
-            // Après pas mal de test je trouve que c'est plutôt stable donc je vais le laisser
+            // Bien sûr cette solution ne permet pas de gérer les stocks
+            // Mais par chance nous n'avons pas à les gérers dans ce TP 
         }
 
         function endSession(){

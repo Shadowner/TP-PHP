@@ -19,14 +19,14 @@ class Product
 
     public function getProductImages()
         {
-
+            $configJson = json_decode(file_get_contents(__DIR__ . "/../config.json"), true);
             $productsDB = $GLOBALS["db_prefix"] . "PRODUCTS";
             $imageDB = $GLOBALS["db_prefix"] . "IMAGES";
             $temp = $GLOBALS["dbh"]->sendQuery("SELECT * FROM $productsDB, $imageDB WHERE ".$productsDB.".ID_PRODUCT = ".$imageDB.".ID_PRODUCT AND ".$imageDB.".ID_PRODUCT = ".$this->id);
             if (count($temp) != 0){
                 $out = [];
                 foreach ($temp as $image) {
-                    $out[] = "/TP-PHP/public/images/".$image['ID_IMAGE'].".".$image['EXTENSION_IMAGE'];
+                    $out[] = "public/images/".$image['ID_IMAGE'].".".$image['EXTENSION_IMAGE'];
                 }
                 return $out;
             }

@@ -425,12 +425,12 @@ footer {
 }
 
 .ptop {
-    padding-top: 10rem;
+    margin-top: 10rem;
 }
 
 .images-holder {
-    max-height: 25rem;
-    overflow: scroll;
+    max-height: 100%;
+    overflow: hidden;
 }
 
 .images-holder img {
